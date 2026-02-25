@@ -195,6 +195,51 @@
             top: -10px;
         }
 
+        /* Title Layout Styles */
+        .layout-title .left-column {
+            flex: none;
+            width: 100%;
+        }
+
+        .layout-title .right-column {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            max-width: 600px;
+            height: auto;
+            text-align: center;
+            background-color: rgba(0, 0, 0, 0.6);
+            /* Default fallback */
+            padding: 40px;
+            border-radius: 20px;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            z-index: 50;
+        }
+
+        .layout-title .right-column h1 {
+            font-size: clamp(2rem, 6vw, 3.5rem);
+            margin-bottom: 20px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .layout-title .right-column p {
+            background-color: transparent;
+            border: none;
+            color: white;
+            font-size: clamp(1.2rem, 3vw, 1.5rem);
+            padding: 0;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+        }
+
+        .layout-title .return-btn {
+            display: none;
+            /* Usually title slides don't need a return btn back to themselves */
+        }
+
         /* Responsive scaling down */
         @media (max-width: 740px) {
             .main-wrapper {
@@ -276,6 +321,14 @@
                     return;
                 }
 
+                // Apply layout class
+                elements.container.className = 'slide-container'; // Reset
+                if (slide.layout) {
+                    elements.container.classList.add(`layout-${slide.layout}`);
+                } else {
+                    elements.container.classList.add('layout-two-column');
+                }
+
                 // Update DOM
                 elements.img.style.display = 'block';
                 document.getElementById('img-fallback').style.display = 'none';
@@ -286,7 +339,13 @@
 
                 elements.header.textContent = slide.header;
                 elements.text.textContent = slide.text;
-                elements.contentCol.style.backgroundColor = slide.background_color || '#333';
+
+                // Layout specific background application
+                if (slide.layout === 'title') {
+                    elements.contentCol.style.backgroundColor = slide.background_color || 'rgba(0,0,0,0.6)';
+                } else {
+                    elements.contentCol.style.backgroundColor = slide.background_color || '#333';
+                }
 
                 // Clear existing hotspots
                 const existingHotspots = elements.container.querySelectorAll('.hotspot');

@@ -1,13 +1,50 @@
 let initialConfig = {
     slides: [
         {
+            id: "title-slide",
+            layout: "title",
+            img_url: "https://images.code.org/1d353552973622ec7da5f2f055a2ac1b-test-img-1.png",
+            alt_text: "Title background",
+            header: "The Power of Generative AI",
+            text: "Exploring how AI learns, creates, and impacts the world of art.",
+            background_color: "rgba(77, 162, 198, 0.85)",
+            return_id_link: "artist-home",
+            hotspots: [
+                {
+                    "x": 50,
+                    "y": 80,
+                    "label": "Begin Exploration",
+                    "target_id": "artist-home",
+                    "label_x": -50,
+                    "label_y": 20
+                },
+                {
+                    "x": 20.55,
+                    "y": 19.15,
+                    "label": "New Hotspot",
+                    "target_id": "",
+                    "label_x": -30,
+                    "label_y": -29
+                },
+                {
+                    "x": 74.47,
+                    "y": 15.76,
+                    "label": "New Hotspot",
+                    "target_id": "",
+                    "label_x": -22,
+                    "label_y": -33
+                }
+            ]
+        },
+        {
             id: "artist-home",
+            layout: "two-column",
             img_url: "https://images.code.org/1d353552973622ec7da5f2f055a2ac1b-test-img-1.png",
             alt_text: "Alt text image 1",
             header: "Is AI fair or is it copying artists?",
             text: "AI studies billions of images to find patterns. Similar to how students read many books to learn writing styles.",
             background_color: "#4da2c6",
-            return_id_link: "artist-home",
+            return_id_link: "title-slide",
             hotspots: [
                 {
                     "x": 69.01,
@@ -37,6 +74,7 @@ let initialConfig = {
         },
         {
             id: "artist-math",
+            layout: "two-column",
             img_url: "https://images.code.org/342749a60e60af943ad0b5d923f74d2d-artist-1.jpg",
             alt_text: "Alt text image 2",
             header: "Images into math",
@@ -46,6 +84,7 @@ let initialConfig = {
         },
         {
             id: "artist-patterns",
+            layout: "two-column",
             img_url: "https://images.code.org/3ee95308b63ecf3c079d25567fd8eefb-artist-2.jpg",
             alt_text: "Alt text image 3",
             header: "New images based on patterns",
@@ -55,6 +94,7 @@ let initialConfig = {
         },
         {
             id: "artist-real",
+            layout: "two-column",
             img_url: "https://images.code.org/36b31147742ee46e36119f15cb4126ac-artist-3.jpg",
             alt_text: "Alt text image 3",
             header: "Trained on real art",

@@ -37,16 +37,36 @@
 
         .image-container {
             position: relative;
-            max-width: 100%;
-            max-height: 100%;
             box-shadow: 0 0 40px rgba(0, 0, 0, 0.2);
             cursor: crosshair;
+            background: #eee;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Default/Fallback */
+        .image-container {
+            max-width: 100%;
+        }
+
+        .image-container.layout-two-column {
+            aspect-ratio: 8 / 9;
+            height: 80vh;
+        }
+
+        .image-container.layout-title {
+            aspect-ratio: 16 / 9;
+            width: 80vw;
+            max-width: 1000px;
         }
 
         .image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
             display: block;
-            max-width: 100%;
-            max-height: 80vh;
         }
 
         .hotspot-marker {
@@ -146,6 +166,10 @@
             <option value="">-- Select a Slide --</option>
         </select>
 
+        <div id="layout-indicator" style="font-size: 12px; color: #666; font-style: italic; margin-bottom: 10px;">
+            Layout: Select a slide
+        </div>
+
         <div id="hotspot-list" style="display: flex; flex-direction: column; gap: 10px;">
             <!-- Hotspot items added here -->
         </div>
@@ -172,6 +196,7 @@
         const imgContainer = document.getElementById('image-container');
         const markersOverlay = document.getElementById('markers-overlay');
         const hotspotList = document.getElementById('hotspot-list');
+        const layoutIndicator = document.getElementById('layout-indicator');
         const jsonPreview = document.getElementById('json-preview');
         const btnCopy = document.getElementById('btn-copy');
         const btnClear = document.getElementById('btn-clear');
@@ -193,6 +218,12 @@
             if (slide) {
                 previewImg.src = slide.img_url;
                 previewImg.style.display = 'block';
+
+                // Update layout preview
+                imgContainer.className = 'image-container'; // Reset
+                const layout = slide.layout || 'two-column';
+                imgContainer.classList.add(`layout-${layout}`);
+                layoutIndicator.textContent = `Layout: ${layout}`;
 
                 // Load existing hotspots from config or clear if none exist
                 if (slide.hotspots && Array.isArray(slide.hotspots)) {
