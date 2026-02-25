@@ -79,6 +79,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            position: relative;
+            /* Fix for absolute hotspots */
         }
 
         .left-column img {
@@ -142,6 +144,55 @@
             width: 24px;
             height: 24px;
             fill: white;
+        }
+
+        /* Hotspot Styles */
+        .hotspot {
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 50%;
+            border: 2px solid #3498db;
+            cursor: pointer;
+            transform: translate(-50%, -50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 100;
+        }
+
+        .hotspot::after {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: #3498db;
+            border-radius: 50%;
+        }
+
+        .hotspot:hover {
+            transform: translate(-50%, -50%) scale(1.2);
+            background: #fff;
+            box-shadow: 0 0 20px rgba(52, 152, 219, 0.6);
+        }
+
+        .hotspot-label {
+            position: absolute;
+            background: #fff;
+            color: #333;
+            padding: 5px 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 600;
+            white-space: nowrap;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            z-index: 101;
+            pointer-events: none;
+            /* Initial default position, will be overridden by JS if config keys exist */
+            left: 20px;
+            top: -10px;
         }
 
         /* Responsive scaling down */
@@ -236,6 +287,43 @@
                 elements.header.textContent = slide.header;
                 elements.text.textContent = slide.text;
                 elements.contentCol.style.backgroundColor = slide.background_color || '#333';
+
+                // Clear existing hotspots
+                const existingHotspots = elements.container.querySelectorAll('.hotspot');
+                existingHotspots.forEach(h => h.remove());
+
+                // Add new hotspots
+                if (slide.hotspots && Array.isArray(slide.hotspots)) {
+                    slide.hotspots.forEach(h => {
+                        const hotspotEl = document.createElement('div');
+                        hotspotEl.className = 'hotspot';
+                        hotspotEl.style.left = `${h.x}%`;
+                        hotspotEl.style.top = `${h.y}%`;
+
+                        if (h.x > 70) {
+                            hotspotEl.classList.add('left-side');
+                        }
+
+                        const labelEl = document.createElement('div');
+                        labelEl.className = 'hotspot-label';
+                        labelEl.textContent = h.label;
+
+                        // Apply manual offsets if provided
+                        if (h.label_x !== undefined) labelEl.style.left = `${h.label_x}px`;
+                        if (h.label_y !== undefined) labelEl.style.top = `${h.label_y}px`;
+
+                        hotspotEl.appendChild(labelEl);
+
+                        hotspotEl.onclick = (e) => {
+                            e.stopPropagation();
+                            if (h.target_id) {
+                                renderSlide(h.target_id);
+                            }
+                        };
+
+                        document.getElementById('img-container').appendChild(hotspotEl);
+                    });
+                }
 
                 // Set up return button
                 elements.returnBtn.onclick = (e) => {

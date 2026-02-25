@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotspot Generator Tool</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            background: #f0f0f0;
+        }
+
+        .editor-side {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow-y: auto;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+        }
+
+        .preview-side {
+            flex: 2;
+            padding: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .image-container {
+            position: relative;
+            max-width: 100%;
+            max-height: 100%;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.2);
+            cursor: crosshair;
+        }
+
+        .image-container img {
+            display: block;
+            max-width: 100%;
+            max-height: 80vh;
+        }
+
+        .hotspot-marker {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: rgba(231, 76, 60, 0.8);
+            border: 2px solid white;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .hotspot-item {
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #fafafa;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .hotspot-item label {
+            font-size: 12px;
+            font-weight: bold;
+            color: #666;
+        }
+
+        input {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .json-output {
+            background: #272822;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+            font-size: 13px;
+            margin-top: auto;
+        }
+
+        button {
+            padding: 10px 15px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #2980b9;
+        }
+
+        .btn-copy {
+            background: #2ecc71;
+        }
+
+        .btn-copy:hover {
+            background: #27ae60;
+        }
+
+        .btn-clear {
+            background: #e74c3c;
+        }
+
+        .btn-clear:hover {
+            background: #c0392b;
+        }
+
+        .slide-selector {
+            padding: 10px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="editor-side">
+        <h2>Hotspot Generator</h2>
+        <p>1. Select a slide.<br>2. Click any spot on the image.<br>3. Fill in the label and target ID.</p>
+
+        <select id="slide-select" class="slide-selector">
+            <option value="">-- Select a Slide --</option>
+        </select>
+
+        <div id="hotspot-list" style="display: flex; flex-direction: column; gap: 10px;">
+            <!-- Hotspot items added here -->
+        </div>
+
+        <div style="display: flex; gap: 10px;">
+            <button id="btn-copy" class="btn-copy">Copy JSON to Clipboard</button>
+            <button id="btn-clear" class="btn-clear">Clear Points</button>
+        </div>
+
+        <div id="json-preview" class="json-output">[]</div>
+    </div>
+
+    <div class="preview-side">
+        <div id="image-container" class="image-container">
+            <img id="preview-img" src="" alt="Select a slide to begin" style="display: none;">
+            <div id="markers-overlay"></div>
+        </div>
+    </div>
+
+    <script src="initialConfig.js"></script>
+    <script>
+        const slideSelect = document.getElementById('slide-select');
+        const previewImg = document.getElementById('preview-img');
+        const imgContainer = document.getElementById('image-container');
+        const markersOverlay = document.getElementById('markers-overlay');
+        const hotspotList = document.getElementById('hotspot-list');
+        const jsonPreview = document.getElementById('json-preview');
+        const btnCopy = document.getElementById('btn-copy');
+        const btnClear = document.getElementById('btn-clear');
+
+        let hotspots = [];
+
+        // Load slides from config
+        if (typeof initialConfig !== 'undefined' && initialConfig.slides) {
+            initialConfig.slides.forEach(slide => {
+                const opt = document.createElement('option');
+                opt.value = slide.id;
+                opt.textContent = `${slide.id} (${slide.header})`;
+                slideSelect.appendChild(opt);
+            });
+        }
+
+        slideSelect.onchange = () => {
+            const slide = initialConfig.slides.find(s => s.id === slideSelect.value);
+            if (slide) {
+                previewImg.src = slide.img_url;
+                previewImg.style.display = 'block';
+
+                // Load existing hotspots from config or clear if none exist
+                if (slide.hotspots && Array.isArray(slide.hotspots)) {
+                    hotspots = slide.hotspots.map(h => ({
+                        ...h,
+                        id: h.id || Math.random(),
+                        label_x: h.label_x ?? 20,
+                        label_y: h.label_y ?? -10
+                    }));
+                } else {
+                    hotspots = [];
+                }
+
+                renderInputs();
+                renderMarkers();
+                updateJSON();
+            }
+        };
+
+        imgContainer.onclick = (e) => {
+            if (!previewImg.src || previewImg.style.display === 'none') return;
+
+            const rect = imgContainer.getBoundingClientRect();
+            const x = ((e.clientX - rect.left) / rect.width) * 100;
+            const y = ((e.clientY - rect.top) / rect.height) * 100;
+
+            addHotspot(x, y);
+        };
+
+        function addHotspot(x, y) {
+            const id = Date.now();
+            const hotspot = {
+                id,
+                x: parseFloat(x.toFixed(2)),
+                y: parseFloat(y.toFixed(2)),
+                label: 'New Hotspot',
+                target_id: '',
+                label_x: 20,
+                label_y: -10
+            };
+            hotspots.push(hotspot);
+            renderInputs();
+            renderMarkers();
+            updateJSON();
+        }
+
+        function renderInputs() {
+            hotspotList.innerHTML = '';
+            hotspots.forEach((h, index) => {
+                const div = document.createElement('div');
+                div.className = 'hotspot-item';
+                div.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:center">
+                        <strong>Point #${index + 1} (${h.x}%, ${h.y}%)</strong>
+                        <button onclick="removeHotspot(${h.id})" style="padding:2px 8px; font-size:10px" class="btn-clear">X</button>
+                    </div>
+                    <label>Label</label>
+                    <input type="text" value="${h.label}" oninput="updateHotspot(${h.id}, 'label', this.value)">
+                    
+                    <div style="display:grid; grid-template-columns: 1fr; gap:5px; margin-top:5px;">
+                        <label>Label X Offset: <span id="val-x-${h.id}">${h.label_x}</span>px</label>
+                        <input type="range" min="-100" max="100" value="${h.label_x}" 
+                               style="width:100%"
+                               oninput="document.getElementById('val-x-${h.id}').textContent=this.value; updateHotspot(${h.id}, 'label_x', parseInt(this.value))">
+                        
+                        <label>Label Y Offset: <span id="val-y-${h.id}">${h.label_y}</span>px</label>
+                        <input type="range" min="-100" max="100" value="${h.label_y}" 
+                               style="width:100%"
+                               oninput="document.getElementById('val-y-${h.id}').textContent=this.value; updateHotspot(${h.id}, 'label_y', parseInt(this.value))">
+                    </div>
+
+                    <label style="margin-top:10px;">Transition to Slide ID</label>
+                    <input type="text" value="${h.target_id || ''}" placeholder="e.g. test-2" oninput="updateHotspot(${h.id}, 'target_id', this.value)">
+                `;
+                hotspotList.appendChild(div);
+            });
+        }
+
+        function renderMarkers() {
+            markersOverlay.innerHTML = '';
+            hotspots.forEach((h, index) => {
+                // The Hotspot Marker
+                const m = document.createElement('div');
+                m.className = 'hotspot-marker';
+                m.style.left = h.x + '%';
+                m.style.top = h.y + '%';
+                m.textContent = index + 1;
+
+                // The Label Preview
+                const l = document.createElement('div');
+                l.style.position = 'absolute';
+                l.style.left = h.label_x + 'px';
+                l.style.top = h.label_y + 'px';
+                l.style.background = 'white';
+                l.style.color = 'black';
+                l.style.padding = '4px 8px';
+                l.style.borderRadius = '4px';
+                l.style.fontSize = '12px';
+                l.style.whiteSpace = 'nowrap';
+                l.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
+                l.style.zIndex = '1000';
+                l.textContent = h.label;
+
+                m.appendChild(l);
+                markersOverlay.appendChild(m);
+            });
+        }
+
+        window.updateHotspot = (id, field, value) => {
+            const h = hotspots.find(h => h.id === id);
+            if (h) {
+                h[field] = value;
+                renderMarkers();
+                updateJSON();
+            }
+        };
+
+        window.removeHotspot = (id) => {
+            hotspots = hotspots.filter(h => h.id !== id);
+            renderInputs();
+            renderMarkers();
+            updateJSON();
+        };
+
+        function clearHotspots() {
+            hotspots = [];
+            renderInputs();
+            renderMarkers();
+            updateJSON();
+        }
+
+        btnClear.onclick = clearHotspots;
+
+        function updateJSON() {
+            const cleanHotspots = hotspots.map(({ x, y, label, target_id, label_x, label_y }) => ({
+                x: parseFloat(x),
+                y: parseFloat(y),
+                label,
+                target_id: target_id || "",
+                label_x: parseInt(label_x),
+                label_y: parseInt(label_y)
+            }));
+            jsonPreview.textContent = JSON.stringify(cleanHotspots, null, 2);
+        }
+
+        btnCopy.onclick = () => {
+            navigator.clipboard.writeText(jsonPreview.textContent)
+                .then(() => alert('JSON Copied! Paste this into your slide object in initialConfig.js'))
+                .catch(err => alert('Failed to copy: ' + err));
+        };
+    </script>
+</body>
+
+</html>
