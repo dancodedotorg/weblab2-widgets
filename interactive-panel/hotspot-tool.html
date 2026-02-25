@@ -168,6 +168,35 @@
             padding: 10px;
             font-size: 16px;
         }
+
+        .palette-grid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 8px;
+            margin-top: 5px;
+        }
+
+        .palette-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 3px solid transparent;
+            cursor: pointer;
+            padding: 0;
+            transition: transform 0.1s, box-shadow 0.2s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .palette-btn:hover {
+            transform: scale(1.15);
+        }
+
+        .palette-btn.active {
+            outline: 2px solid #333;
+            outline-offset: 2px;
+            transform: scale(1.15);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
     </style>
 </head>
 
@@ -252,7 +281,7 @@
                         id: h.id || Math.random(),
                         label_x: h.label_x ?? 20,
                         label_y: h.label_y ?? -10,
-                        color: h.color || '#3498db'
+                        palette: h.palette || 'blue'
                     }));
                 } else {
                     hotspots = [];
@@ -284,7 +313,7 @@
                 target_id: '',
                 label_x: 20,
                 label_y: -10,
-                color: '#3498db'
+                palette: 'blue'
             };
             hotspots.push(hotspot);
             renderInputs();
@@ -320,8 +349,19 @@
                     <label style="margin-top:10px;">Transition to Slide ID</label>
                     <input type="text" value="${h.target_id || ''}" placeholder="e.g. test-2" oninput="updateHotspot(${h.id}, 'target_id', this.value)">
 
-                    <label style="margin-top:10px;">Hotspot Color</label>
-                    <input type="color" value="${h.color || '#3498db'}" oninput="updateHotspot(${h.id}, 'color', this.value)">
+                    <label style="margin-top:10px;">Hotspot Palette</label>
+                    <div class="palette-grid">
+                        ${Object.keys(initialConfig.hotspotPalettes || {}).map(key => {
+                    const p = initialConfig.hotspotPalettes[key];
+                    return `
+                                <button class="palette-btn ${h.palette === key ? 'active' : ''}" 
+                                        style="background: ${p.secondary}; border-color: ${p.primary};" 
+                                        title="${key}"
+                                        onclick="updateHotspot(${h.id}, 'palette', '${key}'); renderInputs();">
+                                </button>
+                            `;
+                }).join('')}
+                    </div>
                 `;
                 hotspotList.appendChild(div);
             });
@@ -335,7 +375,13 @@
                 m.className = 'hotspot-marker';
                 m.style.left = h.x + '%';
                 m.style.top = h.y + '%';
-                m.style.background = h.color || '#e74c3c';
+
+                const palette = (initialConfig.hotspotPalettes && h.palette) ? initialConfig.hotspotPalettes[h.palette] : null;
+                if (palette) {
+                    m.style.background = palette.primary;
+                    m.style.borderColor = 'white';
+                }
+
                 m.textContent = index + 1;
 
                 // The Label Preview
@@ -384,14 +430,14 @@
         btnClear.onclick = clearHotspots;
 
         function updateJSON() {
-            const cleanHotspots = hotspots.map(({ x, y, label, target_id, label_x, label_y, color }) => ({
+            const cleanHotspots = hotspots.map(({ x, y, label, target_id, label_x, label_y, palette }) => ({
                 x: parseFloat(x),
                 y: parseFloat(y),
                 label,
                 target_id: target_id || "",
                 label_x: parseInt(label_x),
                 label_y: parseInt(label_y),
-                color: color || "#3498db"
+                palette: palette || "blue"
             }));
             jsonPreview.textContent = JSON.stringify(cleanHotspots, null, 2);
         }

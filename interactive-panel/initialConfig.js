@@ -1,4 +1,22 @@
 let initialConfig = {
+    hotspotPalettes: {
+        blue: { primary: "#217dbb", secondary: "#D6EAF8" },
+        red: { primary: "#c0392b", secondary: "#FADBD8" },
+        green: { primary: "#1e8449", secondary: "#D5F5E3" },
+        orange: { primary: "#a04000", secondary: "#FDEBD0" },
+        purple: { primary: "#76448a", secondary: "#EBDEF0" },
+        yellow: { primary: "#9a7d0a", secondary: "#FCF3CF" },
+        teal: { primary: "#117864", secondary: "#D1F2EB" },
+        pink: { primary: "#880e4f", secondary: "#F8BBD0" },
+        indigo: { primary: "#1a237e", secondary: "#C5CAE9" },
+        brown: { primary: "#4e342e", secondary: "#D7CCC8" },
+        grey: { primary: "#515a5a", secondary: "#E5E8E8" },
+        black: { primary: "#17202a", secondary: "#D1D5D8" },
+        white: { primary: "#7f8c8d", secondary: "#FDFEFE" },
+        cyan: { primary: "#00838f", secondary: "#B2EBF2" },
+        lime: { primary: "#558b2f", secondary: "#DCEDC8" },
+        amber: { primary: "#ff8f00", secondary: "#FFECB3" }
+    },
     slides: [
         {
             id: "title-slide",
@@ -17,7 +35,7 @@ let initialConfig = {
                     "target_id": "artist-home",
                     "label_x": -50,
                     "label_y": 20,
-                    "color": "#ff3705"
+                    "palette": "red"
                 },
                 {
                     "x": 20.55,
@@ -26,7 +44,7 @@ let initialConfig = {
                     "target_id": "quarter-sample",
                     "label_x": -30,
                     "label_y": -29,
-                    "color": "#e77e7e"
+                    "palette": "blue"
                 },
                 {
                     "x": 74.47,
@@ -35,7 +53,7 @@ let initialConfig = {
                     "target_id": "",
                     "label_x": -22,
                     "label_y": -33,
-                    "color": "#03121c"
+                    "palette": "black"
                 }
             ]
         },
@@ -55,7 +73,7 @@ let initialConfig = {
                     "target_id": "artist-home",
                     "label_x": 0,
                     "label_y": 20,
-                    "color": "#e74c3c"
+                    "palette": "orange"
                 }
             ]
         },
@@ -76,7 +94,7 @@ let initialConfig = {
                     "target_id": "artist-math",
                     "label_x": 30,
                     "label_y": -18,
-                    "color": "#2ecc71"
+                    "palette": "green"
                 },
                 {
                     "x": 66.09,
