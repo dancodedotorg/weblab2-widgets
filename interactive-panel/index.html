@@ -240,6 +240,84 @@
             /* Usually title slides don't need a return btn back to themselves */
         }
 
+        /* Quarter Layout Styles */
+        .layout-quarter {
+            flex-direction: row;
+            /* Default */
+        }
+
+        .layout-quarter.display-top {
+            flex-direction: column;
+        }
+
+        .layout-quarter.display-bottom {
+            flex-direction: column-reverse;
+        }
+
+        .layout-quarter.display-left {
+            flex-direction: row;
+        }
+
+        .layout-quarter.display-right {
+            flex-direction: row-reverse;
+        }
+
+        .layout-quarter .left-column {
+            flex: 3;
+            /* 75% */
+            height: 100%;
+            width: 100%;
+        }
+
+        .layout-quarter .right-column {
+            flex: 1;
+            /* 25% */
+            background-color: #f0f0f0;
+            color: #333;
+            padding: 24px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            height: 100%;
+            box-sizing: border-box;
+        }
+
+        .layout-quarter.display-top .left-column,
+        .layout-quarter.display-bottom .left-column {
+            height: 75%;
+        }
+
+        .layout-quarter.display-top .right-column,
+        .layout-quarter.display-bottom .right-column {
+            height: 25%;
+            width: 100%;
+        }
+
+        .layout-quarter .right-column h1 {
+            font-size: clamp(1.2rem, 3vw, 1.8rem);
+            margin-bottom: 12px;
+            color: inherit;
+        }
+
+        .layout-quarter .right-column p {
+            font-size: clamp(0.9rem, 1.5vw, 1.1rem);
+            background: transparent;
+            padding: 0;
+            border: none;
+            color: inherit;
+        }
+
+        .layout-quarter .return-btn {
+            background: rgba(0, 0, 0, 0.1);
+            bottom: 15px;
+            right: 15px;
+        }
+
+        .layout-quarter .return-btn svg {
+            fill: #333;
+        }
+
         /* Responsive scaling down */
         @media (max-width: 740px) {
             .main-wrapper {
@@ -329,6 +407,11 @@
                     elements.container.classList.add('layout-two-column');
                 }
 
+                // Apply display property for quarter layout
+                if (slide.layout === 'quarter' && slide.display) {
+                    elements.container.classList.add(`display-${slide.display}`);
+                }
+
                 // Update DOM
                 elements.img.style.display = 'block';
                 document.getElementById('img-fallback').style.display = 'none';
@@ -337,14 +420,25 @@
                 elements.img.alt = slide.alt_text || 'Slide Image';
                 document.getElementById('fallback-text').textContent = slide.alt_text || 'Image could not be loaded';
 
-                elements.header.textContent = slide.header;
-                elements.text.textContent = slide.text;
+                elements.header.textContent = slide.header || '';
+                elements.text.textContent = slide.text || '';
 
                 // Layout specific background application
                 if (slide.layout === 'title') {
                     elements.contentCol.style.backgroundColor = slide.background_color || 'rgba(0,0,0,0.6)';
+                } else if (slide.layout === 'quarter') {
+                    elements.contentCol.style.backgroundColor = slide.background_color || '#f0f0f0';
                 } else {
                     elements.contentCol.style.backgroundColor = slide.background_color || '#333';
+                }
+
+                // Return button visibility logic
+                if (slide.layout === 'quarter') {
+                    elements.returnBtn.style.display = slide.return_id_link ? 'flex' : 'none';
+                } else if (slide.layout === 'title') {
+                    elements.returnBtn.style.display = 'none';
+                } else {
+                    elements.returnBtn.style.display = 'flex';
                 }
 
                 // Clear existing hotspots

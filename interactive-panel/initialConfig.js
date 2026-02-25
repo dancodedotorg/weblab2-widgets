@@ -21,8 +21,8 @@ let initialConfig = {
                 {
                     "x": 20.55,
                     "y": 19.15,
-                    "label": "New Hotspot",
-                    "target_id": "",
+                    "label": "Quarter Test",
+                    "target_id": "quarter-sample",
                     "label_x": -30,
                     "label_y": -29
                 },
@@ -33,6 +33,25 @@ let initialConfig = {
                     "target_id": "",
                     "label_x": -22,
                     "label_y": -33
+                }
+            ]
+        },
+        {
+            id: "quarter-sample",
+            layout: "quarter",
+            display: "top",
+            img_url: "https://images.code.org/342749a60e60af943ad0b5d923f74d2d-artist-1.jpg",
+            text: "This is a sample of the 'quarter' layout with the text block on the right.",
+            background_color: "#e0e0e0",
+            return_id_link: "title-slide",
+            hotspots: [
+                {
+                    "x": 50,
+                    "y": 50,
+                    "label": "Center Hotspot",
+                    "target_id": "artist-home",
+                    "label_x": 0,
+                    "label_y": 20
                 }
             ]
         },
