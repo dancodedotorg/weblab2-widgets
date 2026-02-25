@@ -1,4 +1,5 @@
 let initialConfig = {
+    initialSlideId: "quarter-sample",
     hotspotPalettes: {
         blue: { primary: "#217dbb", secondary: "#D6EAF8" },
         red: { primary: "#c0392b", secondary: "#FADBD8" },
@@ -19,50 +20,11 @@ let initialConfig = {
     },
     slides: [
         {
-            id: "title-slide",
-            layout: "title",
-            img_url: "https://images.code.org/1d353552973622ec7da5f2f055a2ac1b-test-img-1.png",
-            alt_text: "Title background",
-            header: "The Power of Generative AI",
-            text: "Exploring how AI learns, creates, and impacts the world of art.",
-            background_color: "rgba(77, 162, 198, 0.85)",
-            return_id_link: "artist-home",
-            hotspots: [
-                {
-                    "x": 50,
-                    "y": 80,
-                    "label": "Begin Exploration",
-                    "target_id": "artist-home",
-                    "label_x": -50,
-                    "label_y": 20,
-                    "palette": "red"
-                },
-                {
-                    "x": 20.55,
-                    "y": 19.15,
-                    "label": "Quarter Test",
-                    "target_id": "quarter-sample",
-                    "label_x": -30,
-                    "label_y": -29,
-                    "palette": "blue"
-                },
-                {
-                    "x": 74.47,
-                    "y": 15.76,
-                    "label": "New Hotspot",
-                    "target_id": "",
-                    "label_x": -22,
-                    "label_y": -33,
-                    "palette": "black"
-                }
-            ]
-        },
-        {
             id: "quarter-sample",
             layout: "quarter",
             display: "top",
             img_url: "https://images.code.org/342749a60e60af943ad0b5d923f74d2d-artist-1.jpg",
-            text: "This is a sample of the 'quarter' layout with the text block on the right.",
+            text: "# Title\n**Bolded** text with `markdown` support!",
             background_color: "#e0e0e0",
             return_id_link: "title-slide",
             hotspots: [
