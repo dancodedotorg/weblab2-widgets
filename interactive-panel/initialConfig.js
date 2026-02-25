@@ -1,5 +1,4 @@
 let initialConfig = {
-    initialSlideId: "quarter-sample",
     hotspotPalettes: {
         blue: { primary: "#217dbb", secondary: "#D6EAF8" },
         red: { primary: "#c0392b", secondary: "#FADBD8" },
@@ -18,93 +17,66 @@ let initialConfig = {
         lime: { primary: "#558b2f", secondary: "#DCEDC8" },
         amber: { primary: "#ff8f00", secondary: "#FFECB3" }
     },
-    slides: [
+    "initialSlideId": "",
+    "slides": [
         {
-            id: "quarter-sample",
-            layout: "quarter",
-            display: "top",
-            img_url: "https://images.code.org/342749a60e60af943ad0b5d923f74d2d-artist-1.jpg",
-            text: "# Title\n**Bolded** text with `markdown` support!",
-            background_color: "#e0e0e0",
-            return_id_link: "title-slide",
+            "id": "title-slide",
+            "layout": "quarter",
+            "display": "top",
+            "img_url": "https://images.code.org/76177ba9427c32cb0d2e01a0fae28332-title-1.jpg",
+            "alt_text": "Decorative title image of a digital landscape",
+            "header": "",
+            "text": "## AI can create amazing art, but it learned from humans artists.\n\n**So what's fair, creative, and ethical in this new world?**\n\nClick the dots to explore more. Click arrows to go back",
+            "background_color": "#c9dfed",
             hotspots: [
                 {
-                    "x": 50,
-                    "y": 50,
-                    "label": "Center Hotspot",
-                    "target_id": "artist-home",
-                    "label_x": 0,
-                    "label_y": 20,
-                    "palette": "orange"
+                    "x": 19.07,
+                    "y": 55.57,
+                    "label": "AI and Fairness",
+                    "target_id": "artist-main",
+                    "label_x": -29,
+                    "label_y": -30,
+                    "palette": "blue"
+                },
+                {
+                    "x": 49.79,
+                    "y": 54.32,
+                    "label": "AI and Creativity",
+                    "target_id": "patterns-main",
+                    "label_x": -40,
+                    "label_y": -28,
+                    "palette": "blue"
+                },
+                {
+                    "x": 81.04,
+                    "y": 53.06,
+                    "label": "AI and Ethics",
+                    "target_id": "steal-main",
+                    "label_x": 20,
+                    "label_y": -10,
+                    "palette": "blue"
                 }
             ]
         },
         {
-            id: "artist-home",
-            layout: "two-column",
-            img_url: "https://images.code.org/1d353552973622ec7da5f2f055a2ac1b-test-img-1.png",
-            alt_text: "Alt text image 1",
-            header: "Is AI fair or is it copying artists?",
-            text: "AI studies billions of images to find patterns. Similar to how students read many books to learn writing styles.",
-            background_color: "#4da2c6",
-            return_id_link: "title-slide",
-            hotspots: [
-                {
-                    "x": 69.01,
-                    "y": 31.05,
-                    "label": "Images Into Math",
-                    "target_id": "artist-math",
-                    "label_x": 30,
-                    "label_y": -18,
-                    "palette": "green"
-                },
-                {
-                    "x": 66.09,
-                    "y": 50.03,
-                    "label": "New images based on patterns",
-                    "target_id": "artist-patterns",
-                    "label_x": -100,
-                    "label_y": -36
-                },
-                {
-                    "x": 56.06,
-                    "y": 80.03,
-                    "label": "Trained on real art",
-                    "target_id": "artist-real",
-                    "label_x": 7,
-                    "label_y": -32
-                }
-            ]
+            "id": "artist-main",
+            "layout": "two-column",
+            "img_url": "https://images.code.org/234f1614f8c038d8e61a9fc04c163fe4-artist-main.png",
+            "header": "Is AI fair or is it copying artists?",
+            "text": "AI studies billions of images to find patterns. \nSimilar to how students read many books to learn writing styles.",
+            "return_id_link": "title-slide",
+            "alt_text": "Artist alt text",
+            "background_color": "#4da2c6"
         },
         {
-            id: "artist-math",
-            layout: "two-column",
-            img_url: "https://images.code.org/342749a60e60af943ad0b5d923f74d2d-artist-1.jpg",
-            alt_text: "Alt text image 2",
-            header: "Images into math",
-            text: "The AI scans huge collections of images to notice repeated shapes, colors, textures, and layouts.",
-            background_color: "#4da2c6",
-            return_id_link: "artist-home"
-        },
-        {
-            id: "artist-patterns",
-            layout: "two-column",
-            img_url: "https://images.code.org/3ee95308b63ecf3c079d25567fd8eefb-artist-2.jpg",
-            alt_text: "Alt text image 3",
-            header: "New images based on patterns",
-            text: "Instead of saving pictures, it adjusts mathematical settings based on patterns it sees again and again.",
-            background_color: "#4da2c6",
-            return_id_link: "artist-home"
-        },
-        {
-            id: "artist-real",
-            layout: "two-column",
-            img_url: "https://images.code.org/36b31147742ee46e36119f15cb4126ac-artist-3.jpg",
-            alt_text: "Alt text image 3",
-            header: "Trained on real art",
-            text: "After training, it combines learned patterns to create something new, not a direct copy.",
-            background_color: "#4da2c6",
-            return_id_link: "artist-home"
+            "id": "artist-1",
+            "layout": "two-column",
+            "img_url": "https://images.code.org/22b375c96fd62d84a444e611d686d9e6-artist-1.jpg",
+            "header": "",
+            "text": "The AI scans huge collections of images to notice repeated shapes, colors, textures, and layouts.\n",
+            "return_id_link": "artist-main",
+            "alt_text": "Artist 1",
+            "background_color": "#4da2c6"
         }
     ]
 }
