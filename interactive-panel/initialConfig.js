@@ -16,7 +16,8 @@ let initialConfig = {
                     "label": "Begin Exploration",
                     "target_id": "artist-home",
                     "label_x": -50,
-                    "label_y": 20
+                    "label_y": 20,
+                    "color": "#ff3705"
                 },
                 {
                     "x": 20.55,
@@ -24,7 +25,8 @@ let initialConfig = {
                     "label": "Quarter Test",
                     "target_id": "quarter-sample",
                     "label_x": -30,
-                    "label_y": -29
+                    "label_y": -29,
+                    "color": "#e77e7e"
                 },
                 {
                     "x": 74.47,
@@ -32,7 +34,8 @@ let initialConfig = {
                     "label": "New Hotspot",
                     "target_id": "",
                     "label_x": -22,
-                    "label_y": -33
+                    "label_y": -33,
+                    "color": "#03121c"
                 }
             ]
         },
@@ -51,7 +54,8 @@ let initialConfig = {
                     "label": "Center Hotspot",
                     "target_id": "artist-home",
                     "label_x": 0,
-                    "label_y": 20
+                    "label_y": 20,
+                    "color": "#e74c3c"
                 }
             ]
         },
@@ -71,7 +75,8 @@ let initialConfig = {
                     "label": "Images Into Math",
                     "target_id": "artist-math",
                     "label_x": 30,
-                    "label_y": -18
+                    "label_y": -18,
+                    "color": "#2ecc71"
                 },
                 {
                     "x": 66.09,

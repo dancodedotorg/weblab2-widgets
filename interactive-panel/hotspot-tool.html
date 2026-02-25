@@ -251,7 +251,8 @@
                         ...h,
                         id: h.id || Math.random(),
                         label_x: h.label_x ?? 20,
-                        label_y: h.label_y ?? -10
+                        label_y: h.label_y ?? -10,
+                        color: h.color || '#3498db'
                     }));
                 } else {
                     hotspots = [];
@@ -282,7 +283,8 @@
                 label: 'New Hotspot',
                 target_id: '',
                 label_x: 20,
-                label_y: -10
+                label_y: -10,
+                color: '#3498db'
             };
             hotspots.push(hotspot);
             renderInputs();
@@ -317,6 +319,9 @@
 
                     <label style="margin-top:10px;">Transition to Slide ID</label>
                     <input type="text" value="${h.target_id || ''}" placeholder="e.g. test-2" oninput="updateHotspot(${h.id}, 'target_id', this.value)">
+
+                    <label style="margin-top:10px;">Hotspot Color</label>
+                    <input type="color" value="${h.color || '#3498db'}" oninput="updateHotspot(${h.id}, 'color', this.value)">
                 `;
                 hotspotList.appendChild(div);
             });
@@ -330,6 +335,7 @@
                 m.className = 'hotspot-marker';
                 m.style.left = h.x + '%';
                 m.style.top = h.y + '%';
+                m.style.background = h.color || '#e74c3c';
                 m.textContent = index + 1;
 
                 // The Label Preview
@@ -378,13 +384,14 @@
         btnClear.onclick = clearHotspots;
 
         function updateJSON() {
-            const cleanHotspots = hotspots.map(({ x, y, label, target_id, label_x, label_y }) => ({
+            const cleanHotspots = hotspots.map(({ x, y, label, target_id, label_x, label_y, color }) => ({
                 x: parseFloat(x),
                 y: parseFloat(y),
                 label,
                 target_id: target_id || "",
                 label_x: parseInt(label_x),
-                label_y: parseInt(label_y)
+                label_y: parseInt(label_y),
+                color: color || "#3498db"
             }));
             jsonPreview.textContent = JSON.stringify(cleanHotspots, null, 2);
         }
