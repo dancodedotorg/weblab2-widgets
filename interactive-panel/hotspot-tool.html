@@ -238,6 +238,15 @@
         <h2>Hotspot Generator</h2>
         <p>1. Select a slide.<br>2. Click any spot on the image.<br>3. Fill in the label and target ID.</p>
 
+        <details
+            style="margin-bottom: 10px; border: 1px solid #ccc; padding: 10px; border-radius: 4px; background: #fafafa;">
+            <summary style="cursor: pointer; font-weight: bold; font-size: 14px; outline: none;">Load Custom Config
+            </summary>
+            <textarea id="import-config-text" placeholder='{ "slides": [...] }'
+                style="width: 100%; height: 100px; margin-top: 10px; font-family: monospace; font-size: 12px; resize: vertical; box-sizing: border-box;"></textarea>
+            <button id="btn-load-config" style="margin-top: 10px; background: #f39c12;">Load Config</button>
+        </details>
+
         <select id="slide-select" class="slide-selector">
             <option value="">-- Select a Slide --</option>
         </select>
@@ -276,22 +285,74 @@
         const jsonPreview = document.getElementById('json-preview');
         const btnCopy = document.getElementById('btn-copy');
         const btnClear = document.getElementById('btn-clear');
+        const btnLoadConfig = document.getElementById('btn-load-config');
+        const importConfigText = document.getElementById('import-config-text');
 
         let hotspots = [];
         let recenterId = null; // Tracks which hotspot is currently being moved
 
-        // Initialize: Load all available slides from the global config into the dropdown
-        if (typeof initialConfig !== 'undefined' && initialConfig.slides) {
-            initialConfig.slides.forEach(slide => {
-                const opt = document.createElement('option');
-                opt.value = slide.id;
-                opt.textContent = `${slide.id} (${slide.header})`;
-                slideSelect.appendChild(opt);
-            });
+        // Function to populate the dropdown from initialConfig
+        function populateSlideSelect() {
+            slideSelect.innerHTML = '<option value="">-- Select a Slide --</option>';
+            // Either use window.initialConfig if overridden, or the global initialConfig from the script tag
+            const conf = window.initialConfig || (typeof initialConfig !== 'undefined' ? initialConfig : null);
+
+            if (conf && conf.slides) {
+                conf.slides.forEach(slide => {
+                    const opt = document.createElement('option');
+                    opt.value = slide.id;
+                    opt.textContent = `${slide.id} (${slide.header})`;
+                    slideSelect.appendChild(opt);
+                });
+            }
         }
 
+        // Initialize: Load all available slides from the global config into the dropdown
+        populateSlideSelect();
+
+        btnLoadConfig.onclick = () => {
+            try {
+                let rawText = importConfigText.value.trim();
+                if (!rawText) return alert("Please paste a JSON configuration first.");
+
+                // Process string if user copied "let initialConfig = { ... };"
+                if (rawText.includes('=')) rawText = rawText.substring(rawText.indexOf('{'));
+                if (rawText.endsWith(';')) rawText = rawText.substring(0, rawText.length - 1);
+
+                // Parse using Function to support unquoted keys and JS syntax
+                const parsedConfig = new Function('return ' + rawText)();
+
+                if (parsedConfig && parsedConfig.slides && Array.isArray(parsedConfig.slides)) {
+                    // Update the active config object
+                    window.initialConfig = parsedConfig;
+
+                    // Reset UI State
+                    populateSlideSelect();
+                    slideSelect.value = '';
+                    previewImg.style.display = 'none';
+                    imgContainer.className = 'image-container';
+                    layoutIndicator.textContent = 'Layout: Select a slide';
+                    hotspots = [];
+                    recenterId = null;
+                    renderInputs();
+                    renderMarkers();
+                    updateJSON();
+
+                    alert(`Successfully loaded ${parsedConfig.slides.length} slides from pasted config.`);
+                } else {
+                    alert('Invalid format: The object must contain a "slides" array.');
+                }
+            } catch (err) {
+                alert('Failed to parse the configuration. Please ensure it is a valid object structure.\nError: ' + err.message);
+            }
+        };
+
         slideSelect.onchange = () => {
-            const slide = initialConfig.slides.find(s => s.id === slideSelect.value);
+            // Use our dynamically loaded config or the default one
+            const conf = window.initialConfig || (typeof initialConfig !== 'undefined' ? initialConfig : null);
+            if (!conf || !conf.slides) return;
+
+            const slide = conf.slides.find(s => s.id === slideSelect.value);
             if (slide) {
                 previewImg.src = slide.img_url;
                 previewImg.style.display = 'block';
