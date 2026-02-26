@@ -76,7 +76,7 @@
             flex: 1;
             height: 100%;
             overflow: hidden;
-            background: #eee;
+            background: transparent;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -85,10 +85,23 @@
         }
 
         .left-column img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
             display: block;
+        }
+
+        .left-column,
+        .right-column {
+            transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .slide-container.switching .left-column,
+        .slide-container.switching .right-column {
+            opacity: 0;
+            transform: scale(0.98);
         }
 
         .right-column {
@@ -100,7 +113,7 @@
             flex-direction: column;
             justify-content: center;
             color: var(--accent-color);
-            transition: background-color 0.4s ease;
+            background: transparent;
         }
 
         .right-column .slide-header {
@@ -411,9 +424,17 @@
                 setTimeout(() => { elements.error.style.display = 'none'; }, 5000);
             }
 
-            function renderSlide(slideId) {
-                // Accessing initialConfig directly (it's declared in initialConfig.js)
-                // We avoid prepending 'window.' as requested.
+            function preloadImage(url) {
+                return new Promise((resolve) => {
+                    if (!url) return resolve();
+                    const img = new Image();
+                    img.onload = () => resolve();
+                    img.onerror = () => resolve();
+                    img.src = url;
+                });
+            }
+
+            async function renderSlide(slideId) {
                 if (typeof initialConfig === 'undefined' || !initialConfig.slides) {
                     showError("Configuration not found.");
                     return;
@@ -428,6 +449,15 @@
                     return;
                 }
 
+                // Start transition
+                elements.container.classList.add('switching');
+
+                // Preload image before showing next slide
+                await preloadImage(slide.img_url);
+
+                // Wait for fade out animation to finish (at least partially)
+                await new Promise(r => setTimeout(r, 300));
+
                 // Apply layout class
                 elements.container.className = 'slide-container'; // Reset
                 if (slide.layout) {
@@ -436,7 +466,6 @@
                     elements.container.classList.add('layout-two-column');
                 }
 
-                // Apply display property for quarter layout
                 if (slide.layout === 'quarter' && slide.display) {
                     elements.container.classList.add(`display-${slide.display}`);
                 }
@@ -456,20 +485,17 @@
                 } else {
                     elements.header.textContent = slide.header || '';
                     elements.text.textContent = slide.text || '';
-                    // Simple newline to br fallback if marked fails to load
                     if (slide.text) elements.text.innerHTML = slide.text.replace(/\n/g, '<br>');
                 }
 
-                // Layout specific background application
                 if (slide.layout === 'title') {
-                    elements.contentCol.style.backgroundColor = slide.background_color || 'rgba(0,0,0,0.6)';
+                    elements.container.style.backgroundColor = slide.background_color || 'rgba(0,0,0,0.6)';
                 } else if (slide.layout === 'quarter') {
-                    elements.contentCol.style.backgroundColor = slide.background_color || '#f0f0f0';
+                    elements.container.style.backgroundColor = slide.background_color || '#f0f0f0';
                 } else {
-                    elements.contentCol.style.backgroundColor = slide.background_color || '#333';
+                    elements.container.style.backgroundColor = slide.background_color || '#333';
                 }
 
-                // Return button visibility logic
                 if (slide.layout === 'quarter') {
                     elements.returnBtn.style.display = slide.return_id_link ? 'flex' : 'none';
                 } else if (slide.layout === 'title') {
@@ -478,11 +504,9 @@
                     elements.returnBtn.style.display = 'flex';
                 }
 
-                // Clear existing hotspots
                 const existingHotspots = elements.container.querySelectorAll('.hotspot');
                 existingHotspots.forEach(h => h.remove());
 
-                // Add new hotspots
                 if (slide.hotspots && Array.isArray(slide.hotspots)) {
                     slide.hotspots.forEach(h => {
                         const hotspotEl = document.createElement('div');
@@ -490,11 +514,8 @@
                         hotspotEl.style.left = `${h.x}%`;
                         hotspotEl.style.top = `${h.y}%`;
 
-                        if (h.x > 70) {
-                            hotspotEl.classList.add('left-side');
-                        }
+                        if (h.x > 70) hotspotEl.classList.add('left-side');
 
-                        // Apply custom palette if specified
                         const palette = (initialConfig.hotspotPalettes && h.palette)
                             ? initialConfig.hotspotPalettes[h.palette]
                             : (initialConfig.hotspotPalettes ? initialConfig.hotspotPalettes.blue : null);
@@ -506,16 +527,13 @@
 
                         const dotEl = document.createElement('div');
                         dotEl.className = 'hotspot-dot';
-                        if (palette) {
-                            dotEl.style.backgroundColor = palette.primary;
-                        }
+                        if (palette) dotEl.style.backgroundColor = palette.primary;
                         hotspotEl.appendChild(dotEl);
 
                         const labelEl = document.createElement('div');
                         labelEl.className = 'hotspot-label';
                         labelEl.textContent = h.label;
 
-                        // Apply manual offsets if provided
                         if (h.label_x !== undefined) labelEl.style.left = `${h.label_x}px`;
                         if (h.label_y !== undefined) labelEl.style.top = `${h.label_y}px`;
 
@@ -523,24 +541,24 @@
 
                         hotspotEl.onclick = (e) => {
                             e.stopPropagation();
-                            if (h.target_id) {
-                                renderSlide(h.target_id);
-                            }
+                            if (h.target_id) renderSlide(h.target_id);
                         };
 
                         document.getElementById('img-container').appendChild(hotspotEl);
                     });
                 }
 
-                // Set up return button
                 elements.returnBtn.onclick = (e) => {
                     e.preventDefault();
-                    if (slide.return_id_link) {
-                        renderSlide(slide.return_id_link);
-                    }
+                    if (slide.return_id_link) renderSlide(slide.return_id_link);
                 };
 
                 currentSlideId = slide.id;
+
+                // End transition - wait a frame to ensure DOM updates applied before fading in
+                requestAnimationFrame(() => {
+                    elements.container.classList.remove('switching');
+                });
             }
 
             // Initialize after the config script has likely executed
