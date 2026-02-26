@@ -10,6 +10,7 @@ The `initialConfig` object in `initialConfig.js` supports these global propertie
 | :--- | :--- | :--- |
 | `initialSlideId` | String | (Optional) The ID of the slide to display on load. |
 | `hotspotPalettes`| Object | (Optional) Define custom color themes for hotspots. |
+| `slides` | Array | A list of slide objects configuring each slide's content and layouts. |
 
 ### Hotspot Palettes
 Each palette entry should have a `primary` (border/dot) and `secondary` (fill) color.

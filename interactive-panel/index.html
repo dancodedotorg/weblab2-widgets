@@ -421,6 +421,7 @@
 
     <script>
         (function () {
+            // Cache DOM elements for better performance and easier reference
             const elements = {
                 container: document.getElementById('slide-container'),
                 img: document.getElementById('slide-img'),
@@ -433,12 +434,20 @@
 
             let currentSlideId = null;
 
+            /**
+             * Displays an error message banner at the top of the screen.
+             * Auto-hides after 5 seconds.
+             */
             function showError(msg) {
                 elements.error.textContent = msg;
                 elements.error.style.display = 'block';
                 setTimeout(() => { elements.error.style.display = 'none'; }, 5000);
             }
 
+            /**
+             * Preloads an image to ensure smooth transitions between slides.
+             * Resolves regardless of success/error so the render loop doesn't block forever.
+             */
             function preloadImage(url) {
                 return new Promise((resolve) => {
                     if (!url) return resolve();
@@ -449,12 +458,19 @@
                 });
             }
 
+            /**
+             * Main render function that handles rendering a new slide.
+             * Resolves data from initialConfig, sets up the layout, parses markdown,
+             * and dynamically creates hotspots.
+             */
             async function renderSlide(slideId) {
+                // Ensure configuration data exists
                 if (typeof initialConfig === 'undefined' || !initialConfig.slides) {
                     showError("Configuration not found.");
                     return;
                 }
 
+                // Determine which slide to load: specific ID, initial fallback, or the very first item
                 const slide = initialConfig.slides.find(s => s.id === slideId)
                     || (initialConfig.initialSlideId && initialConfig.slides.find(s => s.id === initialConfig.initialSlideId))
                     || initialConfig.slides[0];
@@ -464,7 +480,7 @@
                     return;
                 }
 
-                // Start transition
+                // 1. Start transition: fade out elements before changing content
                 elements.container.classList.add('switching');
 
                 // Preload image before showing next slide
@@ -473,7 +489,7 @@
                 // Wait for fade out animation to finish (at least partially)
                 await new Promise(r => setTimeout(r, 300));
 
-                // Apply layout class
+                // 2. Apply layout classes dynamically based on schema config
                 elements.container.className = 'slide-container'; // Reset
                 if (slide.layout) {
                     elements.container.classList.add(`layout-${slide.layout}`);
@@ -485,7 +501,8 @@
                     elements.container.classList.add(`display-${slide.display}`);
                 }
 
-                // Update DOM
+                // 3. Update DOM image and fallback text
+
                 elements.img.style.display = 'block';
                 document.getElementById('img-fallback').style.display = 'none';
 
@@ -493,6 +510,7 @@
                 elements.img.alt = slide.alt_text || 'Slide Image';
                 document.getElementById('fallback-text').textContent = slide.alt_text || 'Image could not be loaded';
 
+                // 4. Parse header and body text text (use marked library for rich text if available)
                 if (typeof marked !== 'undefined') {
                     marked.setOptions({ breaks: true, gfm: true });
                     elements.header.innerHTML = slide.header ? marked.parse(slide.header) : '';
@@ -519,6 +537,7 @@
                     elements.returnBtn.style.display = 'flex';
                 }
 
+                // 5. Clean up existing hotspots and attach new ones defined in config
                 const existingHotspots = elements.container.querySelectorAll('.hotspot');
                 existingHotspots.forEach(h => h.remove());
 

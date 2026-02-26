@@ -278,9 +278,9 @@
         const btnClear = document.getElementById('btn-clear');
 
         let hotspots = [];
-        let recenterId = null;
+        let recenterId = null; // Tracks which hotspot is currently being moved
 
-        // Load slides from config
+        // Initialize: Load all available slides from the global config into the dropdown
         if (typeof initialConfig !== 'undefined' && initialConfig.slides) {
             initialConfig.slides.forEach(slide => {
                 const opt = document.createElement('option');
@@ -326,14 +326,17 @@
             }
         };
 
+        // Handle clicks on the image preview area
         imgContainer.onclick = (e) => {
             if (!previewImg.src || previewImg.style.display === 'none') return;
 
+            // Calculate click coordinates as percentages for responsive scaling
             const rect = imgContainer.getBoundingClientRect();
             const x = ((e.clientX - rect.left) / rect.width) * 100;
             const y = ((e.clientY - rect.top) / rect.height) * 100;
 
             if (recenterId) {
+                // We are in "Move Point" mode: update coordinates of the selected hotspot
                 const h = hotspots.find(h => h.id === recenterId);
                 if (h) {
                     h.x = parseFloat(x.toFixed(2));
@@ -345,6 +348,7 @@
                     updateJSON();
                 }
             } else {
+                // Normal mode: add a new hotspot at the clicked location
                 addHotspot(x, y);
             }
         };
@@ -367,6 +371,9 @@
             updateJSON();
         }
 
+        /**
+         * Rebuilds the left-side editor panel inputs based on the current hotspots array.
+         */
         function renderInputs() {
             hotspotList.innerHTML = '';
             hotspots.forEach((h, index) => {
@@ -418,6 +425,9 @@
             });
         }
 
+        /**
+         * Rebuilds the visual markers on the right-side image preview based on the hotspots array.
+         */
         function renderMarkers() {
             markersOverlay.innerHTML = '';
             hotspots.forEach((h, index) => {
@@ -498,6 +508,9 @@
 
         btnClear.onclick = clearHotspots;
 
+        /**
+         * Generates and formats the final JSON output of the hotspots array for copying.
+         */
         function updateJSON() {
             const cleanHotspots = hotspots.map(({ x, y, label, target_id, label_x, label_y, palette }) => ({
                 x: parseFloat(x),

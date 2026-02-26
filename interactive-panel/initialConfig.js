@@ -1,6 +1,13 @@
+/**
+ * Global Configuration for the Interactive Panel
+ * 
+ * Defines the entire presentation structure, including:
+ * - hotspotPalettes: Custom themes for hotspot styling.
+ * - initialSlideId: Optional default slide to load first.
+ * - slides: Array of slide objects holding layout, text, image, and hotspot data.
+ */
 let initialConfig = {
     hotspotPalettes: {
-        blue: { primary: "#217dbb", secondary: "#D6EAF8" },
         red: { primary: "#c0392b", secondary: "#FADBD8" },
         green: { primary: "#1e8449", secondary: "#D5F5E3" },
         orange: { primary: "#a04000", secondary: "#FDEBD0" },
