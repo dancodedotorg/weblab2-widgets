@@ -164,6 +164,38 @@
             background: #c0392b;
         }
 
+        .btn-recenter {
+            background: #f39c12;
+        }
+
+        .btn-recenter:hover {
+            background: #e67e22;
+        }
+
+        .btn-recenter.active {
+            background: #e74c3c;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.7;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        .recenter-mode {
+            cursor: crosshair !important;
+            outline: 3px solid #f39c12;
+        }
+
         .slide-selector {
             padding: 10px;
             font-size: 16px;
@@ -246,6 +278,7 @@
         const btnClear = document.getElementById('btn-clear');
 
         let hotspots = [];
+        let recenterId = null;
 
         // Load slides from config
         if (typeof initialConfig !== 'undefined' && initialConfig.slides) {
@@ -300,7 +333,20 @@
             const x = ((e.clientX - rect.left) / rect.width) * 100;
             const y = ((e.clientY - rect.top) / rect.height) * 100;
 
-            addHotspot(x, y);
+            if (recenterId) {
+                const h = hotspots.find(h => h.id === recenterId);
+                if (h) {
+                    h.x = parseFloat(x.toFixed(2));
+                    h.y = parseFloat(y.toFixed(2));
+                    recenterId = null;
+                    imgContainer.classList.remove('recenter-mode');
+                    renderInputs();
+                    renderMarkers();
+                    updateJSON();
+                }
+            } else {
+                addHotspot(x, y);
+            }
         };
 
         function addHotspot(x, y) {
@@ -329,7 +375,12 @@
                 div.innerHTML = `
                     <div style="display:flex; justify-content:space-between; align-items:center">
                         <strong>Point #${index + 1} (${h.x}%, ${h.y}%)</strong>
-                        <button onclick="removeHotspot(${h.id})" style="padding:2px 8px; font-size:10px" class="btn-clear">X</button>
+                        <div style="display:flex; gap:5px;">
+                            <button onclick="toggleRecenter(${h.id})" style="padding:2px 8px; font-size:10px" class="btn-recenter ${recenterId === h.id ? 'active' : ''}">
+                                ${recenterId === h.id ? 'Cancel' : 'Move Point'}
+                            </button>
+                            <button onclick="removeHotspot(${h.id})" style="padding:2px 8px; font-size:10px" class="btn-clear">X</button>
+                        </div>
                     </div>
                     <label>Label</label>
                     <input type="text" value="${h.label}" oninput="updateHotspot(${h.id}, 'label', this.value)">
@@ -384,6 +435,11 @@
 
                 m.textContent = index + 1;
 
+                if (recenterId === h.id) {
+                    m.style.boxShadow = '0 0 0 4px rgba(243, 156, 18, 0.5)';
+                    m.style.zIndex = '2000';
+                }
+
                 // The Label Preview
                 const l = document.createElement('div');
                 l.style.position = 'absolute';
@@ -414,10 +470,23 @@
         };
 
         window.removeHotspot = (id) => {
+            if (recenterId === id) recenterId = null;
             hotspots = hotspots.filter(h => h.id !== id);
             renderInputs();
             renderMarkers();
             updateJSON();
+        };
+
+        window.toggleRecenter = (id) => {
+            if (recenterId === id) {
+                recenterId = null;
+                imgContainer.classList.remove('recenter-mode');
+            } else {
+                recenterId = id;
+                imgContainer.classList.add('recenter-mode');
+            }
+            renderInputs();
+            renderMarkers();
         };
 
         function clearHotspots() {
