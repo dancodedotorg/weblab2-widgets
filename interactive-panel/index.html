@@ -56,7 +56,8 @@
             background-color: #fff;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             border-radius: 8px;
-            overflow: hidden;
+            /* Changed to visible to prevent hotspot tooltip clipping */
+            overflow: visible;
             position: relative;
             display: flex;
             min-width: var(--min-width);
@@ -75,7 +76,8 @@
         .left-column {
             flex: 1;
             height: 100%;
-            overflow: hidden;
+            /* Changed to visible to prevent hotspot tooltip clipping */
+            overflow: visible;
             background: transparent;
             display: flex;
             align-items: center;
@@ -228,11 +230,24 @@
             font-weight: 600;
             white-space: nowrap;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            z-index: 101;
+            /* Ensure tooltips are above everything, including other hotspots */
+            z-index: 1000;
             pointer-events: none;
             /* Initial default position, will be overridden by JS if config keys exist */
             left: 20px;
             top: -10px;
+            transition: transform 0.2s ease;
+        }
+
+        /* Adjust labels if they are on the far right */
+        .hotspot.left-side .hotspot-label {
+            left: auto;
+            right: 20px;
+        }
+
+        /* Ensure label stays visible even when parent scales */
+        .hotspot:hover .hotspot-label {
+            z-index: 2000;
         }
 
         /* Title Layout Styles */
@@ -534,7 +549,12 @@
                         labelEl.className = 'hotspot-label';
                         labelEl.textContent = h.label;
 
-                        if (h.label_x !== undefined) labelEl.style.left = `${h.label_x}px`;
+                        if (h.label_x !== undefined) {
+                            labelEl.style.left = `${h.label_x}px`;
+                            // If user manually set a negative offset that moves it too far left, 
+                            // we don't force 'left-side' class which would flip it back right.
+                            if (h.label_x < 0) hotspotEl.classList.remove('left-side');
+                        }
                         if (h.label_y !== undefined) labelEl.style.top = `${h.label_y}px`;
 
                         hotspotEl.appendChild(labelEl);

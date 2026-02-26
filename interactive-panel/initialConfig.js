@@ -25,12 +25,12 @@ let initialConfig = {
             "display": "top",
             "img_url": "https://images.code.org/76177ba9427c32cb0d2e01a0fae28332-title-1.jpg",
             "header": "",
-            "text": "## AI can create amazing art, but it learned from humans artists.\n\n**So what's fair, creative, and ethical in this new world?**\n\nClick the dots to explore more. Click arrows to go back",
+            "text": "## AI can create amazing art, but it learned from humans artists.\n**So what's fair, creative, and ethical in this new world?**\nClick the dots to explore more. Click arrows to go back",
             "background_color": "#c9dfed",
             hotspots: [
                 {
-                    "x": 19.07,
-                    "y": 55.57,
+                    "x": 26.06,
+                    "y": 52.81,
                     "label": "AI and Fairness",
                     "target_id": "artist-main",
                     "label_x": -29,
@@ -47,8 +47,8 @@ let initialConfig = {
                     "palette": "blue"
                 },
                 {
-                    "x": 81.04,
-                    "y": 53.06,
+                    "x": 73.62,
+                    "y": 52.81,
                     "label": "AI and Ethics",
                     "target_id": "steal-main",
                     "label_x": -29,
@@ -203,7 +203,36 @@ let initialConfig = {
             "text": "Is AI ethical or is it stealing from artists?",
             "return_id_link": "title-slide",
             "alt_text": "steal alt text",
-            "background_color": "#a64d79"
+            "background_color": "#a64d79",
+            "hotspots": [
+                {
+                    "x": 90.48,
+                    "y": 33.07,
+                    "label": "How to be more fair",
+                    "target_id": "steal-1",
+                    "label_x": -85,
+                    "label_y": -30,
+                    "palette": "red"
+                },
+                {
+                    "x": 21.86,
+                    "y": 71.96,
+                    "label": "Artists inspired by other artists",
+                    "target_id": "steal-2",
+                    "label_x": -48,
+                    "label_y": 44,
+                    "palette": "red"
+                },
+                {
+                    "x": 69.66,
+                    "y": 76.25,
+                    "label": "Art used without credit",
+                    "target_id": "steal-3",
+                    "label_x": 4,
+                    "label_y": 37,
+                    "palette": "red"
+                }
+            ]
         },
         {
             "id": "steal-1",
